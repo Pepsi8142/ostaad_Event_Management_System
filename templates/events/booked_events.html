@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Your Booked Events</h2>
+    <ul class="list-group">
+        {% for booking in bookings %}
+            <li class="list-group-item">{{ booking.event.name }} - {{ booking.event.date }} at {{ booking.event.location }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
