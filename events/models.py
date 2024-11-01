@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -32,3 +33,33 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.user.username} booked {self.event.name}"
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    date_of_birth = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+
+    def validate_phone_number(self):
+        if self.phone_number and not self.phone_number.isdigit():
+            raise ValueError('Phone number must contain only digits.')
+        if self.phone_number and len(self.phone_number) != 11:
+            raise ValueError('Phone number must be 11 digits long.')
+
+    def validate_date_of_birth(self):
+        if self.date_of_birth and self.date_of_birth > datetime.date.today():
+            raise ValueError('Date of birth cannot be in the future.')
+
+    def save(self, *args, **kwargs):
+        self.validate_phone_number()
+        self.validate_date_of_birth()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'User Profile'
+        verbose_name_plural = 'User Profiles'
+
+    def __str__(self):
+        return self.user.username

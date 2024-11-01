@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from .models import Event, Booking
+from .models import Event, Booking, UserProfile
 from .forms import EventForm, UserProfileForm
 from django.contrib import messages
 
@@ -58,14 +58,34 @@ def logout_view(request):
 
 @login_required
 def profile(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    return render(request, 'events/profile.html', {'user_profile': user_profile})
+
+
+@login_required
+def update_profile(request):
+    user_profile = UserProfile.objects.get(user=request.user)
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             form.save()
-            return redirect('booked_events')
+            return redirect('profile')
     else:
-        form = UserProfileForm(instance=request.user)
-    return render(request, 'events/profile.html', {'form': form})
+        form = UserProfileForm(instance=user_profile)
+    return render(request, 'events/update_profile.html', {'form': form})
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('profile')
+    else:
+        form = PasswordChangeForm(user=request.user)
+    return render(request, 'events/change_password.html', {'form': form})
 
 
 @login_required

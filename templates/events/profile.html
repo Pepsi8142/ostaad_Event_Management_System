@@ -1,10 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Profile</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Update Profile</button>
-    </form>
+    <h2>Profile of <strong>{{ user_profile.user.get_full_name }}</strong></h2>
+
+    {% if user.is_authenticated %}
+        <p>Your Profile Picture:</p>
+        {% if user_profile.profile_picture %}
+            <img src="{{ user_profile.profile_picture.url }}" class="img rounded-circle img-thumbnail" alt="Profile Picture" style="width: 200px; height: 200px">
+        {% else %}
+            <p>No profile picture uploaded.</p>
+        {% endif %}
+
+        <p>Welcome, <b>{{ user_profile.user.get_full_name }}!</b></p>
+        <p>You are logged in as <b>{{ user_profile.user.email }}</b></p>
+        <p>Your Phone Number: <b>{{ user_profile.phone_number }}</b></p>
+        <p>Your Date of Birth: <b>{{ user_profile.date_of_birth }}</b></p>
+        <p>Your Bio: {{ user_profile.bio }}</p>
+
+        <a class="btn btn-primary" href="{% url 'update_profile' %}">Update Profile</a>
+        <a class="btn btn-secondary" href="{% url 'change_password' %}">Change Password</a>
+    {% endif %}
 {% endblock %}

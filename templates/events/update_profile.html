@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Update Profile</h2>
+    <form id="update" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </form>
+    <div>
+        <button form="update" type="submit" class="btn btn-primary">Update Profile</button>
+        <a href="{% url 'profile' %}" class="btn btn-secondary">Back to Profile</a>
+    </div>
+{% endblock %}

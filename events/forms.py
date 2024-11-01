@@ -1,5 +1,5 @@
 from django import forms
-from .models import Event
+from .models import Event, UserProfile
 from django.contrib.auth.models import User
 
 
@@ -19,5 +19,12 @@ class EventForm(forms.ModelForm):
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ['username', 'email', 'first_name', 'last_name']
+        model = UserProfile
+        fields = '__all__'
+        exclude = ['user']
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control', 'type': 'file'}),
+        }
